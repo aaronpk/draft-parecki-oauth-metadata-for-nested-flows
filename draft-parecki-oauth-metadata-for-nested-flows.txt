@@ -4,7 +4,7 @@
 
 Web Authorization Protocol                                    A. Parecki
 Internet-Draft                                                      Okta
-Intended status: Informational                           23 October 2023
+Intended status: Standards Track                         23 October 2023
 Expires: 25 April 2024
 
 
@@ -145,3 +145,4 @@ Author's Address
    Aaron Parecki
    Okta
    Email: aaron@parecki.com
+   URI:   https://aaronparecki.com
