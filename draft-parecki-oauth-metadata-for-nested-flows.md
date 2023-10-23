@@ -122,33 +122,6 @@ For the sake of simplicity, we will refer to the parties involved in the flow as
 
 (In practice, in the inner OAuth flow, the Authorization Server is acting as an OAuth Client to the Identity Provider.)
 
-<!--
-title Nested OAuth Flow
-
-participant "User Agent" as UA
-participant "Client" as C
-participant "Authorization Server" as AS
-participant "Identity Provider" as IdP
-
-
-group Outer OAuth Flow (Client to AS)
-C->UA: 1. Redirect to AS
-UA->AS: 2. Redirect to AS
-group Inner OAuth flow (AS to IdP)
-AS->UA: 3. Redirect to IDP
-UA->IdP: 4. Redirect to IdP
-note over IdP: 5. User Login
-IdP-->UA: 6. Authorization Code
-UA->AS: 7. Authorization Code
-AS->IdP: 8. Token Request with\nAuthorization Code
-IdP-->AS: 9. Access Token\n    + ID Token
-end
-UA<--AS: 10. Authorization Code
-UA->C: 11. Authorization Code
-C->AS: 12. Token Request with\nAuthorization Code
-C<--AS: 13. Access Token
-end
--->
 
 <artwork type="svg" src="nested-oauth-flow.svg"/>
 
@@ -238,23 +211,21 @@ The parameters defined in {{parameters}} are added to the Request Object as desc
 
 The following is an example of the Claims in a Request Object before the base64url encoding and signing.
 
-```
-  {
-   "iss": "s6BhdRkqt3",
-   "aud": "https://idp.example.com",
-   "response_type": "code",
-   "client_id": "s6BhdRkqt3",
-   "redirect_uri": "https://client.example.org/cb",
-   "scope": "openid profile",
-   "state": "af0ifjsldkj",
-   "max_age": 86400,
-   "application_class_id": "1234",
-   "application_class_name": "Chat for iOS",
-   "device_id": "9876",
-   "device_name": "Alice's iPhone",
-   "session_ref": "5124"
-  }
-```
+    {
+     "iss": "s6BhdRkqt3",
+     "aud": "https://idp.example.com",
+     "response_type": "code",
+     "client_id": "s6BhdRkqt3",
+     "redirect_uri": "https://client.example.org/cb",
+     "scope": "openid profile",
+     "state": "af0ifjsldkj",
+     "max_age": 86400,
+     "application_class_id": "1234",
+     "application_class_name": "Chat for iOS",
+     "device_id": "9876",
+     "device_name": "Alice's iPhone",
+     "session_ref": "5124"
+    }
 
 
 
