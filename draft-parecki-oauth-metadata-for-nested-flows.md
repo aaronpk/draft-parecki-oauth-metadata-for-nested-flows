@@ -150,6 +150,7 @@ C<--AS: 13. Access Token
 end
 -->
 
+<artwork type="svg" src="nested-oauth-flow.svg"/>
 
 1. The OAuth Client initiates an OAuth flow by redirecting the User Agent to the Authorization Server.
 2. The User Agent visits the Authorization Server.
