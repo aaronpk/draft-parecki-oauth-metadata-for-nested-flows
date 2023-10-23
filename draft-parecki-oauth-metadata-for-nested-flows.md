@@ -41,8 +41,9 @@ normative:
       - ins: B. de Medeiros
       - ins: C. Mortimore
 
-
 informative:
+  RFC9101:
+  RFC9126:
 
 
 --- abstract
@@ -112,13 +113,62 @@ the Authorization Server or OpenID Provider that is used for End-User authentica
 
 # Protocol Overview {#overview}
 
+For the sake of simplicity, we will refer to the parties involved in the flow as:
+
+* User Agent: The browser used by the End-User
+* Client: The OAuth client that is being used by the End-User
+* Authorization Server (AS): The authorization server the Client interacts with and is expecting to receive tokens from
+* Identity Provider (IdP): The authorization server where the End-User has an account and logs in
+
+(In practice, in the inner OAuth flow, the Authorization Server is acting as an OAuth Client to the Identity Provider.)
+
+<!--
+title Nested OAuth Flow
+
+participant "User Agent" as UA
+participant "Client" as C
+participant "Authorization Server" as AS
+participant "Identity Provider" as IdP
 
 
-1. The OAuth Client initiates an OAuth flow with the Authorization Server.
-1. The Authorization Server initiates an OAuth flow with the Identity Provider.
-1. The Identity Provider authenticates the End-User and redirects them back to the Authorization Server.
-1. The Authorization Server redirects the End-User back to the Client.
-1. The Client finishes the authorization flow by obtainining tokens from the Authorization Server.
+group Outer OAuth Flow (Client to AS)
+C->UA: 1. Redirect to AS
+UA->AS: 2. Redirect to AS
+group Inner OAuth flow (AS to IdP)
+AS->UA: 3. Redirect to IDP
+UA->IdP: 4. Redirect to IdP
+note over IdP: 5. User Login
+IdP-->UA: 6. Authorization Code
+UA->AS: 7. Authorization Code
+AS->IdP: 8. Token Request with\nAuthorization Code
+IdP-->AS: 9. Access Token\n    + ID Token
+end
+UA<--AS: 10. Authorization Code
+UA->C: 11. Authorization Code
+C->AS: 12. Token Request with\nAuthorization Code
+C<--AS: 13. Access Token
+end
+-->
+
+![nested oauth flow](./nested-oauth-flow.svg)
+
+1. The OAuth Client initiates an OAuth flow by redirecting the User Agent to the Authorization Server.
+2. The User Agent visits the Authorization Server.
+3. The Authorization Server initiates a new OAuth flow as the OAuth client to the Identity Provider by redirecting the User Agent to the Identity Provider.
+4. The User Agent visits the Identity Provider.
+5. The Identity Provider authenticates the End-User.
+6. The Identity Provider issues an authorization code and redirects the User Agent back to the Authorization Server.
+7. The User Agent visits the Authorization Server carrying the authorization code from the Identity Provider.
+8. The Authorization Server exchanges the authorization code at the Identity Provider for an access token and optional ID token.
+9. The Identity Provider responds with the tokens.
+10. The Authorization Server consumes the tokens and issues its own authorization code, and redirects the User Agent back to the Client.
+11. The User Agent visits the Client carrying the authorization code from the Authorization Server.
+12. The Client exchanges the authorization code for an access token at the Authorization Server.
+13. The Authorization Server responds with the tokens.
+
+In this example, the two OAuth flows are authorization code flows. In practice, the inner flow can often be the OpenID Connect Implicit Flow (with `response_type=id_token`) where there is no intermediate authorization code issued. This distinction is not relevant to the rest of this specification.
+
+Either or both OAuth flows may also be using other OAuth extensions, such as Pushed Authorization Requests {{RFC9126}}, JWT-Secured Authorization Request {{RFC9101}} or others. While these extensions may change the example sequence above slightly, they do not fundamentally change the need for the additional context added by this specification. See {{use-in-flows}} for examples of how to provide the properties defined in this specification along with other OAuth extensions.
 
 
 # Parameters {#parameters}
@@ -144,49 +194,66 @@ to indicate information about the downstream OAuth client:
 
 
 
-# Use in OAuth Flows
+# Use in OAuth Flows {#use-in-flows}
 
 These parameters can be used in any authorization request to an OAuth Authorization Server or OpenID Provider. Below are examples of including the new parameters in various OAuth flows and extensions.
 
 ## OAuth Authorization Request
 
-```
-https://idp.example.com/authorize?response_type=code
-  &client_id=CLIENT_ID
-  &scope=openid+profile
-  &application_class_id=1234
-  &application_class_name=Chat+for+iOS
-  &device_id=9876
-  &device_name=Alice's+iPhone
-  &session_ref=5124
-```
+    https://idp.example.com/authorize?response_type=code
+      &client_id=CLIENT_ID
+      &scope=openid+profile
+      &application_class_id=1234
+      &application_class_name=Chat+for+iOS
+      &device_id=9876
+      &device_name=Alice's+iPhone
+      &session_ref=5124
 
 
 ## Pushed Authorization Requests (PAR) {#par}
 
-```
-POST https://idp.example.com/par
+The parameters defined in {{parameters}} are added to the Pushed Authorization Request as POST body parameters, as described in Section 2.1 of {{RFC9126}}.
 
-client_id=CLIENT_ID
-&scope=openid+profile
-&application_class_id=1234
-&application_class_name=Chat+for+iOS
-&device_id=9876
-&device_name=Alice's+iPhone
-&session_ref=5124
-```
+    POST /par HTTP/1.1
+    Host: idp.example.com
+    Content-Type: application/x-www-form-urlencoded
 
+    response_type=code
+    &state=af0ifjsldkj
+    &client_id=s6BhdRkqt3
+    &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+    &code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
+    &code_challenge_method=S256
+    &scope=openid+profile
+    &application_class_id=1234
+    &application_class_name=Chat+for+iOS
+    &device_id=9876
+    &device_name=Alice's+iPhone
+    &session_ref=5124
 
-## Rich Authorization Request (RAR) {#rar}
-
-```
-TBD
-```
 
 ## JWT-Secured Authorization Request (JAR) {#jar}
 
+The parameters defined in {{parameters}} are added to the Request Object as described in Section 4 of {{RFC9101}}.
+
+The following is an example of the Claims in a Request Object before the base64url encoding and signing.
+
 ```
-TBD
+  {
+   "iss": "s6BhdRkqt3",
+   "aud": "https://idp.example.com",
+   "response_type": "code",
+   "client_id": "s6BhdRkqt3",
+   "redirect_uri": "https://client.example.org/cb",
+   "scope": "openid profile",
+   "state": "af0ifjsldkj",
+   "max_age": 86400,
+   "application_class_id": "1234",
+   "application_class_name": "Chat for iOS",
+   "device_id": "9876",
+   "device_name": "Alice's iPhone",
+   "session_ref": "5124"
+  }
 ```
 
 
@@ -194,7 +261,29 @@ TBD
 
 # Security Considerations
 
-TODO Security
+TODO
+
+## Client Authentication
+
+The Authorization Server acting as an OAuth client to the Identity Provider SHOULD
+
+
+## Confidentiality
+
+The parameters defined by this specification may contain sensitive data, and should not be exposed to unnecessary parties. In particular, passing this data via the browser in redirects opens up opportunities for observing or tampering with this data.
+
+For this reason, Authorization Servers SHOULD use Pushed Authorization Requests {{RFC9126}} and/or JWT-Secured Authorization Request {{RFC9101}} to prevent tampering and exfiltration of the data.
+
+
+## Session Reference
+
+The `session_ref` parameter is meant to be a pointer to a session, and MUST NOT be the same value as the browser sends to the server as the session cookie.
+
+
+# Privacy Considerations
+
+TODO
+
 
 
 # IANA Considerations {#iana}
