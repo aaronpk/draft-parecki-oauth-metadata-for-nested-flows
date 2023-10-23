@@ -1,5 +1,6 @@
 ---
 title: "OAuth Client and Device Metadata for Nested Flows"
+abbrev: "Metadata for Nested Flows"
 category: std
 
 docname: draft-parecki-oauth-metadata-for-nested-flows-latest
@@ -123,7 +124,10 @@ For the sake of simplicity, we will refer to the parties involved in the flow as
 (In practice, in the inner OAuth flow, the Authorization Server is acting as an OAuth Client to the Identity Provider.)
 
 
-<artwork type="svg" src="nested-oauth-flow.svg"/>
+TODO: Convert to ASCII art
+
+https://github.com/aaronpk/oauth-metadata-for-nested-flows/blob/main/nested-oauth-flow.svg
+
 
 1. The OAuth Client initiates an OAuth flow by redirecting the User Agent to the Authorization Server.
 2. The User Agent visits the Authorization Server.
