@@ -175,6 +175,8 @@ Table of Contents
    Authorization Code C->AS: 12.  Token Request with\nAuthorization Code
    C<--AS: 13.  Access Token end -->
 
+   (Artwork only available as svg: nested-oauth-flow.svg)
+
    1.   The OAuth Client initiates an OAuth flow by redirecting the User
         Agent to the Authorization Server.
 
