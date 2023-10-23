@@ -122,34 +122,6 @@ For the sake of simplicity, we will refer to the parties involved in the flow as
 
 (In practice, in the inner OAuth flow, the Authorization Server is acting as an OAuth Client to the Identity Provider.)
 
-<!--
-title Nested OAuth Flow
-
-participant "User Agent" as UA
-participant "Client" as C
-participant "Authorization Server" as AS
-participant "Identity Provider" as IdP
-
-
-group Outer OAuth Flow (Client to AS)
-C->UA: 1. Redirect to AS
-UA->AS: 2. Redirect to AS
-group Inner OAuth flow (AS to IdP)
-AS->UA: 3. Redirect to IDP
-UA->IdP: 4. Redirect to IdP
-note over IdP: 5. User Login
-IdP-->UA: 6. Authorization Code
-UA->AS: 7. Authorization Code
-AS->IdP: 8. Token Request with\nAuthorization Code
-IdP-->AS: 9. Access Token\n    + ID Token
-end
-UA<--AS: 10. Authorization Code
-UA->C: 11. Authorization Code
-C->AS: 12. Token Request with\nAuthorization Code
-C<--AS: 13. Access Token
-end
--->
-
 ![nested oauth flow](./nested-oauth-flow.svg)
 
 1. The OAuth Client initiates an OAuth flow by redirecting the User Agent to the Authorization Server.
