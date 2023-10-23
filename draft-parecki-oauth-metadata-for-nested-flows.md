@@ -174,7 +174,11 @@ These parameters can be used in any authorization request to an OAuth Authorizat
 ## OAuth Authorization Request
 
     https://idp.example.com/authorize?response_type=code
-      &client_id=CLIENT_ID
+      &state=af0ifjsldkj
+      &client_id=s6BhdRkqt3
+      &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+      &code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
+      &code_challenge_method=S256
       &scope=openid+profile
       &application_class_id=1234
       &application_class_name=Chat+for+iOS
