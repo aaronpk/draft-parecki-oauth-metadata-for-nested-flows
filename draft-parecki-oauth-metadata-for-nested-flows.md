@@ -176,7 +176,7 @@ These parameters can be used in any authorization request to an OAuth Authorizat
     https://idp.example.com/authorize?response_type=code
       &state=af0ifjsldkj
       &client_id=s6BhdRkqt3
-      &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+      &redirect_uri=https%3A%2F%2Fas.example.org%2Fcb
       &code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
       &code_challenge_method=S256
       &scope=openid+profile
@@ -198,7 +198,7 @@ The parameters defined in {{parameters}} are added to the Pushed Authorization R
     response_type=code
     &state=af0ifjsldkj
     &client_id=s6BhdRkqt3
-    &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+    &redirect_uri=https%3A%2F%2Fas.example.org%2Fcb
     &code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
     &code_challenge_method=S256
     &scope=openid+profile
@@ -220,7 +220,7 @@ The following is an example of the Claims in a Request Object before the base64u
      "aud": "https://idp.example.com",
      "response_type": "code",
      "client_id": "s6BhdRkqt3",
-     "redirect_uri": "https://client.example.org/cb",
+     "redirect_uri": "https://as.example.org/cb",
      "scope": "openid profile",
      "state": "af0ifjsldkj",
      "max_age": 86400,
