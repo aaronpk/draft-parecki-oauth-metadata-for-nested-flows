@@ -1642,7 +1642,7 @@ be the actual session cookie. This identifier enables the IdP to identify a user
 https://idp.example.com/authorize?response_type=code
   &amp;state=af0ifjsldkj
   &amp;client_id=s6BhdRkqt3
-  &amp;redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+  &amp;redirect_uri=https%3A%2F%2Fas.example.org%2Fcb
   &amp;code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
   &amp;code_challenge_method=S256
   &amp;scope=openid+profile
@@ -1670,7 +1670,7 @@ Content-Type: application/x-www-form-urlencoded
 response_type=code
 &amp;state=af0ifjsldkj
 &amp;client_id=s6BhdRkqt3
-&amp;redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+&amp;redirect_uri=https%3A%2F%2Fas.example.org%2Fcb
 &amp;code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
 &amp;code_challenge_method=S256
 &amp;scope=openid+profile
@@ -1697,7 +1697,7 @@ response_type=code
  "aud": "https://idp.example.com",
  "response_type": "code",
  "client_id": "s6BhdRkqt3",
- "redirect_uri": "https://client.example.org/cb",
+ "redirect_uri": "https://as.example.org/cb",
  "scope": "openid profile",
  "state": "af0ifjsldkj",
  "max_age": 86400,
