@@ -1299,18 +1299,7 @@ the Authorization Server or OpenID Provider that is used for End-User authentica
 </li>
       </ul>
 <p id="section-3-3">(In practice, in the inner OAuth flow, the Authorization Server is acting as an OAuth Client to the Identity Provider.)<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">UA: 6. Authorization Code
-UA-&gt;AS: 7. Authorization Code
-AS-&gt;IdP: 8. Token Request with\nAuthorization Code
-IdP--&gt;AS: 9. Access Token\n    + ID Token
-end
-UA&lt;--AS: 10. Authorization Code
-UA-&gt;C: 11. Authorization Code
-C-&gt;AS: 12. Token Request with\nAuthorization Code
-C&lt;--AS: 13. Access Token
-end
---&gt;<a href="#section-3-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-svg artwork" id="section-3-5">
+<div class="alignLeft art-svg artwork" id="section-3-4">
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="794" height="1032" viewBox="0 0 794.0 1032.0">
           <desc>title%20Nested%20OAuth%20Flow%0A%0Aparticipant%20%22User%20Agent%22%20as%20UA%0Aparticipant%20%22Client%22%20as%20C%0Aparticipant%20%22Authorization%20Server%22%20as%20AS%0Aparticipant%20%22Identity%20Provider%22%20as%20IdP%0A%0A%0Agroup%20Outer%20OAuth%20Flow%20(Client%20to%20AS)%0AC-%3EUA%3A%201.%20Redirect%20to%20AS%0AUA-%3EAS%3A%202.%20Redirect%20to%20AS%0Agroup%20Inner%20OAuth%20flow%20(AS%20to%20IdP)%0AAS-%3EUA%3A%203.%20Redirect%20to%20IDP%0AUA-%3EIdP%3A%204.%20Redirect%20to%20IdP%0Anote%20over%20IdP%3A%205.%20User%20Login%0AIdP--%3EUA%3A%206.%20Authorization%20Code%0AUA-%3EAS%3A%207.%20Authorization%20Code%0AAS-%3EIdP%3A%208.%20Token%20Request%20with%5CnAuthorization%20Code%0AIdP--%3EAS%3A%209.%20Access%20Token%5Cn%20%20%20%20%2B%20ID%20Token%0Aend%0AUA%3C--AS%3A%2010.%20Authorization%20Code%0AUA-%3EC%3A%2011.%20Authorization%20Code%0AC-%3EAS%3A%2012.%20Token%20Request%20with%5CnAuthorization%20Code%0AC%3C--AS%3A%2013.%20Access%20Token%0Aend</desc>
           <defs></defs>
@@ -1553,51 +1542,51 @@ end
               </g>
             </g>
           </g>
-        </svg><a href="#section-3-5" class="pilcrow">¶</a>
+        </svg><a href="#section-3-4" class="pilcrow">¶</a>
 </div>
-<ol start="1" type="1" class="normal type-1" id="section-3-6">
-<li id="section-3-6.1">
-          <p id="section-3-6.1.1">The OAuth Client initiates an OAuth flow by redirecting the User Agent to the Authorization Server.<a href="#section-3-6.1.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3-5">
+<li id="section-3-5.1">
+          <p id="section-3-5.1.1">The OAuth Client initiates an OAuth flow by redirecting the User Agent to the Authorization Server.<a href="#section-3-5.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-6.2">
-          <p id="section-3-6.2.1">The User Agent visits the Authorization Server.<a href="#section-3-6.2.1" class="pilcrow">¶</a></p>
+        <li id="section-3-5.2">
+          <p id="section-3-5.2.1">The User Agent visits the Authorization Server.<a href="#section-3-5.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-6.3">
-          <p id="section-3-6.3.1">The Authorization Server initiates a new OAuth flow as the OAuth client to the Identity Provider by redirecting the User Agent to the Identity Provider.<a href="#section-3-6.3.1" class="pilcrow">¶</a></p>
+        <li id="section-3-5.3">
+          <p id="section-3-5.3.1">The Authorization Server initiates a new OAuth flow as the OAuth client to the Identity Provider by redirecting the User Agent to the Identity Provider.<a href="#section-3-5.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-6.4">
-          <p id="section-3-6.4.1">The User Agent visits the Identity Provider.<a href="#section-3-6.4.1" class="pilcrow">¶</a></p>
+        <li id="section-3-5.4">
+          <p id="section-3-5.4.1">The User Agent visits the Identity Provider.<a href="#section-3-5.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-6.5">
-          <p id="section-3-6.5.1">The Identity Provider authenticates the End-User.<a href="#section-3-6.5.1" class="pilcrow">¶</a></p>
+        <li id="section-3-5.5">
+          <p id="section-3-5.5.1">The Identity Provider authenticates the End-User.<a href="#section-3-5.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-6.6">
-          <p id="section-3-6.6.1">The Identity Provider issues an authorization code and redirects the User Agent back to the Authorization Server.<a href="#section-3-6.6.1" class="pilcrow">¶</a></p>
+        <li id="section-3-5.6">
+          <p id="section-3-5.6.1">The Identity Provider issues an authorization code and redirects the User Agent back to the Authorization Server.<a href="#section-3-5.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-6.7">
-          <p id="section-3-6.7.1">The User Agent visits the Authorization Server carrying the authorization code from the Identity Provider.<a href="#section-3-6.7.1" class="pilcrow">¶</a></p>
+        <li id="section-3-5.7">
+          <p id="section-3-5.7.1">The User Agent visits the Authorization Server carrying the authorization code from the Identity Provider.<a href="#section-3-5.7.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-6.8">
-          <p id="section-3-6.8.1">The Authorization Server exchanges the authorization code at the Identity Provider for an access token and optional ID token.<a href="#section-3-6.8.1" class="pilcrow">¶</a></p>
+        <li id="section-3-5.8">
+          <p id="section-3-5.8.1">The Authorization Server exchanges the authorization code at the Identity Provider for an access token and optional ID token.<a href="#section-3-5.8.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-6.9">
-          <p id="section-3-6.9.1">The Identity Provider responds with the tokens.<a href="#section-3-6.9.1" class="pilcrow">¶</a></p>
+        <li id="section-3-5.9">
+          <p id="section-3-5.9.1">The Identity Provider responds with the tokens.<a href="#section-3-5.9.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-6.10">
-          <p id="section-3-6.10.1">The Authorization Server consumes the tokens and issues its own authorization code, and redirects the User Agent back to the Client.<a href="#section-3-6.10.1" class="pilcrow">¶</a></p>
+        <li id="section-3-5.10">
+          <p id="section-3-5.10.1">The Authorization Server consumes the tokens and issues its own authorization code, and redirects the User Agent back to the Client.<a href="#section-3-5.10.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-6.11">
-          <p id="section-3-6.11.1">The User Agent visits the Client carrying the authorization code from the Authorization Server.<a href="#section-3-6.11.1" class="pilcrow">¶</a></p>
+        <li id="section-3-5.11">
+          <p id="section-3-5.11.1">The User Agent visits the Client carrying the authorization code from the Authorization Server.<a href="#section-3-5.11.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-6.12">
-          <p id="section-3-6.12.1">The Client exchanges the authorization code for an access token at the Authorization Server.<a href="#section-3-6.12.1" class="pilcrow">¶</a></p>
+        <li id="section-3-5.12">
+          <p id="section-3-5.12.1">The Client exchanges the authorization code for an access token at the Authorization Server.<a href="#section-3-5.12.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-6.13">
-          <p id="section-3-6.13.1">The Authorization Server responds with the tokens.<a href="#section-3-6.13.1" class="pilcrow">¶</a></p>
+        <li id="section-3-5.13">
+          <p id="section-3-5.13.1">The Authorization Server responds with the tokens.<a href="#section-3-5.13.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
-<p id="section-3-7">In this example, the two OAuth flows are authorization code flows. In practice, the inner flow can often be the OpenID Connect Implicit Flow (with <code>response_type=id_token</code>) where there is no intermediate authorization code issued. This distinction is not relevant to the rest of this specification.<a href="#section-3-7" class="pilcrow">¶</a></p>
-<p id="section-3-8">Either or both OAuth flows may also be using other OAuth extensions, such as Pushed Authorization Requests <span>[<a href="#RFC9126" class="cite xref">RFC9126</a>]</span>, JWT-Secured Authorization Request <span>[<a href="#RFC9101" class="cite xref">RFC9101</a>]</span> or others. While these extensions may change the example sequence above slightly, they do not fundamentally change the need for the additional context added by this specification. See <a href="#use-in-flows" class="auto internal xref">Section 5</a> for examples of how to provide the properties defined in this specification along with other OAuth extensions.<a href="#section-3-8" class="pilcrow">¶</a></p>
+<p id="section-3-6">In this example, the two OAuth flows are authorization code flows. In practice, the inner flow can often be the OpenID Connect Implicit Flow (with <code>response_type=id_token</code>) where there is no intermediate authorization code issued. This distinction is not relevant to the rest of this specification.<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-3-7">Either or both OAuth flows may also be using other OAuth extensions, such as Pushed Authorization Requests <span>[<a href="#RFC9126" class="cite xref">RFC9126</a>]</span>, JWT-Secured Authorization Request <span>[<a href="#RFC9101" class="cite xref">RFC9101</a>]</span> or others. While these extensions may change the example sequence above slightly, they do not fundamentally change the need for the additional context added by this specification. See <a href="#use-in-flows" class="auto internal xref">Section 5</a> for examples of how to provide the properties defined in this specification along with other OAuth extensions.<a href="#section-3-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="parameters">
@@ -1697,23 +1686,25 @@ response_type=code
         </h3>
 <p id="section-5.3-1">The parameters defined in <a href="#parameters" class="auto internal xref">Section 4</a> are added to the Request Object as described in Section 4 of <span>[<a href="#RFC9101" class="cite xref">RFC9101</a>]</span>.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 <p id="section-5.3-2">The following is an example of the Claims in a Request Object before the base64url encoding and signing.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
-<p id="section-5.3-3"><code>
-  {
-   "iss": "s6BhdRkqt3",
-   "aud": "https://idp.example.com",
-   "response_type": "code",
-   "client_id": "s6BhdRkqt3",
-   "redirect_uri": "https://client.example.org/cb",
-   "scope": "openid profile",
-   "state": "af0ifjsldkj",
-   "max_age": 86400,
-   "application_class_id": "1234",
-   "application_class_name": "Chat for iOS",
-   "device_id": "9876",
-   "device_name": "Alice's iPhone",
-   "session_ref": "5124"
-  }
-</code><a href="#section-5.3-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.3-3">
+<pre>
+{
+ "iss": "s6BhdRkqt3",
+ "aud": "https://idp.example.com",
+ "response_type": "code",
+ "client_id": "s6BhdRkqt3",
+ "redirect_uri": "https://client.example.org/cb",
+ "scope": "openid profile",
+ "state": "af0ifjsldkj",
+ "max_age": 86400,
+ "application_class_id": "1234",
+ "application_class_name": "Chat for iOS",
+ "device_id": "9876",
+ "device_name": "Alice's iPhone",
+ "session_ref": "5124"
+}
+</pre><a href="#section-5.3-3" class="pilcrow">¶</a>
+</div>
 </section>
 </div>
 </section>
