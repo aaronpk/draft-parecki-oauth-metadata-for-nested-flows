@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>OAuth Client and Device Metadata for Nested Flows</title>
+<meta content="Aaron Parecki" name="author">
+<meta content="
+       This specification defines a vocabulary and method of transmitting
+information about an OAuth client when a user is redirected through one
+or more authorization servers during an OAuth flow. This
+provides the deeper nested authorization servers with additional context
+that they can use for informational or revocation purposes. 
+    " name="description">
+<meta content="xml2rfc 3.18.2" name="generator">
+<meta content="oauth" name="keyword">
+<meta content="delegation" name="keyword">
+<meta content="draft-parecki-oauth-metadata-for-nested-flows-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.18.2
+    Python 3.11.6
+    ConfigArgParse 1.5.3
+    google-i18n-address 3.1.0
+    intervaltree 3.1.0
+    Jinja2 3.1.2
+    lxml 4.9.3
+    platformdirs 3.11.0
+    pycountry 22.3.5
+    PyYAML 6.0
+    requests 2.31.0
+    setuptools 67.7.2
+    six 1.16.0
+    wcwidth 0.2.8
+-->
+<link href="draft-parecki-oauth-metadata-for-nested-flows.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Cabin Condensed", sans-serif;
+  font-weight: 600;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1#title {
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+}
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+}
+:is(ol, ul) :is(ol, ul) {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  line-height: 1;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+}
+dl.olPercent {
+  --indent: 5ch;
+}
+dl > dt {
+  float: left;
+  margin-right: 2ch;
+  min-width: 8ch;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+dl > dd {
+  margin-bottom: .8em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
+}
+dl.olPercent > dt {
+  min-width: calc(var(--indent) - 2ch);
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:first-child, .break:first-child + *) {
+  margin-top: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:last-child) {
+  margin-bottom: 0;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
+  pre, svg {
+    display: inline-block;
+    overflow-x: auto;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+}
+a.pilcrow[href] { color: var(--pilcrow-weak); }
+a.pilcrow[href]:hover { text-decoration: none; }
+@media not print {
+  :hover > a.pilcrow {
+    opacity: 1;
+  }
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
+    background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+}
+#identifiers dt {
+  width: var(--identifier-width);
+  min-width: var(--identifier-width);
+  clear: left;
+  float: left;
+  text-align: right;
+  margin-right: 1ch;
+}
+#identifiers dd {
+  margin: 0;
+  margin-left: calc(1em + var(--identifier-width)) !important;
+  min-width: 5em;
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+#toc nav ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+#toc nav li {
+  line-height: 1.3em;
+  margin: 2px 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+#toc a.xref {
+  white-space: normal;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 10ch;
+  margin-right: 1.5ch;
+}
+.references dt:target::before {
+  content: "⇒";
+  width: 15px;
+  margin: 0 10px 0 -25px;
+}
+.references dd {
+  margin-left: 12ch !important;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc.active {
+      opacity: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 8px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active nav {
+    display: block;
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin-top: 2px;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  #toc nav > ul  {
+    margin-bottom: 2em;
+  }
+  #toc ul {
+    margin: 0 0 0 4px;
+    font-size: var(--small-font-size);
+  }
+  #toc ul :is(p, li) {
+    margin: 2px 0;
+    line-height: 22px;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+  .toplink {
+    display: none;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Changes introduced to fix issues found during implementation */
+
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin: 8px 0.5em 0;
+}
+
+/* Provide styling for table cell text alignment */
+table .text-left {
+  text-align: left;
+}
+table .text-center {
+  text-align: center;
+}
+table .text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 20em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
+  stroke: var(--text-color);
+}
+svg :is([stroke="white"], [stroke^="#fff"]) {
+  stroke: var(--background-color);
+}
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
+  fill: var(--text-color);
+}
+svg :is([fill="white"], [fill^="#fff"]) {
+  fill: var(--background-color);
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">OAuth Client and Device Metadata for Nes</td>
+<td class="right">October 2023</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Parecki</td>
+<td class="center">Expires 25 April 2024</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Web Authorization Protocol</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-parecki-oauth-metadata-for-nested-flows-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2023-10-23" class="published">23 October 2023</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Standards Track</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2024-04-25">25 April 2024</time></dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">A. Parecki</div>
+<div class="org">Okta</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">OAuth Client and Device Metadata for Nested Flows</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This specification defines a vocabulary and method of transmitting
+information about an OAuth client when a user is redirected through one
+or more authorization servers during an OAuth flow. This
+provides the deeper nested authorization servers with additional context
+that they can use for informational or revocation purposes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        The latest revision of this draft can be found at <span><a href="https://aaronpk.github.io/oauth-metadata-for-nested-flows/draft-parecki-oauth-metadata-for-nested-flows.html">https://aaronpk.github.io/oauth-metadata-for-nested-flows/draft-parecki-oauth-metadata-for-nested-flows.html</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-parecki-oauth-metadata-for-nested-flows/">https://datatracker.ietf.org/doc/draft-parecki-oauth-metadata-for-nested-flows/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        Web Authorization Protocol Working Group mailing list (<span><a href="mailto:oauth@ietf.org">mailto:oauth@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/oauth/">https://mailarchive.ietf.org/arch/browse/oauth/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/oauth/">https://www.ietf.org/mailman/listinfo/oauth/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/aaronpk/oauth-metadata-for-nested-flows">https://github.com/aaronpk/oauth-metadata-for-nested-flows</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 25 April 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2023 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-protocol-overview" class="internal xref">Protocol Overview</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-parameters" class="internal xref">Parameters</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-use-in-oauth-flows" class="internal xref">Use in OAuth Flows</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-oauth-authorization-request" class="internal xref">OAuth Authorization Request</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-pushed-authorization-reques" class="internal xref">Pushed Authorization Requests (PAR)</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-jwt-secured-authorization-r" class="internal xref">JWT-Secured Authorization Request (JAR)</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-client-authentication" class="internal xref">Client Authentication</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-confidentiality" class="internal xref">Confidentiality</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-session-reference" class="internal xref">Session Reference</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-document-history" class="internal xref">Document History</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">In a typical OAuth flow, the OAuth client redirects the user agent to the
+authorization server where the user logs in and (optionally) approves the
+request. The OAuth framework describes the interaction between the Client,
+the Authorization Server, and the Resource Server. The interaction between
+the End-User and the Authorization Server, when the user logs in,
+is intentionally out of scope of OAuth. In practice, user authentication at
+the Authorization Server happens via a wide variety of methods, including
+simple username/password login, as well as redirecting to additional OAuth
+or OpenID Connect servers, such as when using consumer social login providers
+or enterprise identity providers.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">When user authentication happens via an external identity provider, it
+takes place as a brand new OAuth flow from the initial authorization server to the
+external identity provider. The initial authorizaiton server acts as an OAuth
+client to the external identity provider. Because this is a new flow, the context of the
+original OAuth flow is lost, and the external identity provider is unable
+to take actions or record information based on the actual OAuth client the
+End-User is using.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This specification introduces a vocabulary and method of transmitting
+information about an OAuth client to an external identity provider when
+used in nested flows.<a href="#section-1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="conventions-and-definitions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<div id="terminology">
+<section id="section-2.1">
+        <h3 id="name-terminology">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+        </h3>
+<p id="section-2.1-1">This specification uses the terms "Access Token", "Authorization Code",
+"Authorization Endpoint", "Authorization Server" (AS), "Client", "Client Authentication",
+"Client Identifier", "Client Secret", "End-User", "Grant Type", "Protected Resource",
+"Redirection URI", "Refresh Token", "Resource Owner", "Resource Server" (RS)
+and "Token Endpoint" defined by <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>,
+and the terms "OpenID Provider" (OP) and "ID Token" defined by <span>[<a href="#OpenID" class="cite xref">OpenID</a>]</span>.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+<p id="section-2.1-2">TODO: Replace RFC6749 references with OAuth 2.1<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+<p id="section-2.1-3">This specification defines the following terms:<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.1-4">
+          <dt id="section-2.1-4.1">"Application Class":</dt>
+          <dd style="margin-left: 1.5em" id="section-2.1-4.2">
+            <p id="section-2.1-4.2.1">The type of application the End-User is logging in to, as defined by the AS
+in the first OAuth flow.<a href="#section-2.1-4.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-2.1-4.3">"Device":</dt>
+          <dd style="margin-left: 1.5em" id="section-2.1-4.4">
+            <p id="section-2.1-4.4.1">The physical device the End-User is interacting with when authorizing a Client.<a href="#section-2.1-4.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-2.1-5">This specification uses the term "Identity Provider" (IdP) to refer to
+the Authorization Server or OpenID Provider that is used for End-User authentication.<a href="#section-2.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="overview">
+<section id="section-3">
+      <h2 id="name-protocol-overview">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-protocol-overview" class="section-name selfRef">Protocol Overview</a>
+      </h2>
+<p id="section-3-1">For the sake of simplicity, we will refer to the parties involved in the flow as:<a href="#section-3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3-2.1">
+          <p id="section-3-2.1.1">User Agent: The browser used by the End-User<a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-2.2">
+          <p id="section-3-2.2.1">Client: The OAuth client that is being used by the End-User<a href="#section-3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-2.3">
+          <p id="section-3-2.3.1">Authorization Server (AS): The authorization server the Client interacts with and is expecting to receive tokens from<a href="#section-3-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-2.4">
+          <p id="section-3-2.4.1">Identity Provider (IdP): The authorization server where the End-User has an account and logs in<a href="#section-3-2.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-3">(In practice, in the inner OAuth flow, the Authorization Server is acting as an OAuth Client to the Identity Provider.)<a href="#section-3-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-svg artwork" id="section-3-4">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="794" height="1032" viewBox="0 0 794.0 1032.0">
+          <desc>title%20Nested%20OAuth%20Flow%0A%0Aparticipant%20%22User%20Agent%22%20as%20UA%0Aparticipant%20%22Client%22%20as%20C%0Aparticipant%20%22Authorization%20Server%22%20as%20AS%0Aparticipant%20%22Identity%20Provider%22%20as%20IdP%0A%0A%0Agroup%20Outer%20OAuth%20Flow%20(Client%20to%20AS)%0AC-%3EUA%3A%201.%20Redirect%20to%20AS%0AUA-%3EAS%3A%202.%20Redirect%20to%20AS%0Agroup%20Inner%20OAuth%20flow%20(AS%20to%20IdP)%0AAS-%3EUA%3A%203.%20Redirect%20to%20IDP%0AUA-%3EIdP%3A%204.%20Redirect%20to%20IdP%0Anote%20over%20IdP%3A%205.%20User%20Login%0AIdP--%3EUA%3A%206.%20Authorization%20Code%0AUA-%3EAS%3A%207.%20Authorization%20Code%0AAS-%3EIdP%3A%208.%20Token%20Request%20with%5CnAuthorization%20Code%0AIdP--%3EAS%3A%209.%20Access%20Token%5Cn%20%20%20%20%2B%20ID%20Token%0Aend%0AUA%3C--AS%3A%2010.%20Authorization%20Code%0AUA-%3EC%3A%2011.%20Authorization%20Code%0AC-%3EAS%3A%2012.%20Token%20Request%20with%5CnAuthorization%20Code%0AC%3C--AS%3A%2013.%20Access%20Token%0Aend</desc>
+          <defs></defs>
+          <g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g>
+              <rect fill="white" stroke="none" x="0" y="0" width="794" height="1032"></rect>
+            </g>
+            <g>
+              <text fill="black" stroke="none" font-family="sans-serif" font-size="16.5pt" font-style="normal" font-weight="normal" text-decoration="normal" x="301.8165198182324" y="26.3876361" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Nested OAuth Flow</text>
+            </g>
+            <g></g>
+            <g>
+              <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 96.7546657 103.26361593799999 L 96.7546657 1032.108406658" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray="13.532121076923076,5.863919133333333"></path>
+              <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 291.7260926192057 103.26361593799999 L 291.7260926192057 1032.108406658" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray="13.532121076923076,5.863919133333333"></path>
+              <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 491.0282537913411 103.26361593799999 L 491.0282537913411 1032.108406658" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray="13.532121076923076,5.863919133333333"></path>
+              <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 682.1772319800781 103.26361593799999 L 682.1772319800781 1032.108406658" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray="13.532121076923076,5.863919133333333"></path>
+            </g>
+            <g>
+              <path fill="none" stroke="none"></path>
+              <g>
+                <path fill="white" stroke="black" paint-order="fill stroke markers" d=" M 40.9997622413125 55.94178853199999 L 152.5095691586875 55.94178853199999 L 152.5095691586875 103.26361593799999 L 40.9997622413125 103.26361593799999 L 40.9997622413125 55.94178853199999 Z" stroke-miterlimit="10" stroke-width="2.814681184" stroke-dasharray=""></path>
+              </g>
+              <g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="60.086819020312504" y="85.67185853800001" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">User Agent</text>
+              </g>
+              <path fill="none" stroke="none"></path>
+              <g>
+                <path fill="white" stroke="black" paint-order="fill stroke markers" d=" M 253.89888538854555 55.94178853199999 L 329.5532998498659 55.94178853199999 L 329.5532998498659 103.26361593799999 L 253.89888538854555 103.26361593799999 L 253.89888538854555 55.94178853199999 Z" stroke-miterlimit="10" stroke-width="2.814681184" stroke-dasharray=""></path>
+              </g>
+              <g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="272.98594216754555" y="85.67185853800001" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Client</text>
+              </g>
+              <path fill="none" stroke="none"></path>
+              <g>
+                <path fill="white" stroke="black" paint-order="fill stroke markers" d=" M 405.5310712799192 55.94178853199999 L 576.525436302763 55.94178853199999 L 576.525436302763 103.26361593799999 L 405.5310712799192 103.26361593799999 L 405.5310712799192 55.94178853199999 Z" stroke-miterlimit="10" stroke-width="2.814681184" stroke-dasharray=""></path>
+              </g>
+              <g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="424.61812805891924" y="85.67185853800001" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Authorization Server</text>
+              </g>
+              <path fill="none" stroke="none"></path>
+              <g>
+                <path fill="white" stroke="black" paint-order="fill stroke markers" d=" M 610.1267123714882 55.94178853199999 L 754.227751588668 55.94178853199999 L 754.227751588668 103.26361593799999 L 610.1267123714882 103.26361593799999 L 610.1267123714882 55.94178853199999 Z" stroke-miterlimit="10" stroke-width="2.814681184" stroke-dasharray=""></path>
+              </g>
+              <g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="629.2137691504882" y="85.67185853800001" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Identity Provider</text>
+              </g>
+            </g>
+            <g>
+              <g>
+                <g>
+                  <rect fill="white" stroke="none" x="136.1936184182552" y="185.94487571799996" width="116.09352148269531" height="22.86928462"></rect>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="138.8323820282552" y="201.77745737799998" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">1. Redirect to AS</text>
+              </g>
+              <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 291.7260926192057 208.81416033799997 L 111.23854595933334 208.81416033799997" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray=""></path>
+                <g transform="translate(96.7546657,208.81416033799997) translate(-96.7546657,-208.81416033799997)">
+                  <path fill="black" stroke="none" paint-order="stroke fill markers" d=" M 111.41446353333333 201.4842614213333 L 96.7546657 208.81416033799997 L 111.41446353333333 216.14405925466664 Z"></path>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect fill="white" stroke="none" x="235.84469900432288" y="235.20179643799995" width="116.09352148269531" height="22.86928462"></rect>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="238.4834626143229" y="251.03437809799996" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">2. Redirect to AS</text>
+              </g>
+              <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 96.7546657 258.07108105799995 L 476.5443735320078 258.07108105799995" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray=""></path>
+                <g transform="translate(491.0282537913411,258.07108105799995) translate(-491.0282537913411,-258.07108105799995)">
+                  <path fill="black" stroke="none" paint-order="stroke fill markers" d=" M 476.36845595800776 250.74118214133327 L 491.0282537913411 258.07108105799995 L 476.36845595800776 265.4009799746666 Z"></path>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect fill="white" stroke="none" x="233.40375051799475" y="331.95646213799995" width="120.97541845535156" height="22.86928462"></rect>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="236.04251412799476" y="347.78904379799997" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">3. Redirect to IDP</text>
+              </g>
+              <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 491.0282537913411 354.8257467579999 L 111.23854595933334 354.8257467579999" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray=""></path>
+                <g transform="translate(96.7546657,354.8257467579999) translate(-96.7546657,-354.8257467579999)">
+                  <path fill="black" stroke="none" paint-order="stroke fill markers" d=" M 111.41446353333333 347.4958478413333 L 96.7546657 354.8257467579999 L 111.41446353333333 362.1556456746666 Z"></path>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect fill="white" stroke="none" x="330.1951356694921" y="381.21338285799993" width="118.54162634109375" height="22.86928462"></rect>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="332.83389927949213" y="397.04596451799995" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">4. Redirect to IdP</text>
+              </g>
+              <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 96.7546657 404.0826674779999 L 667.6933517207448 404.0826674779999" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray=""></path>
+                <g transform="translate(682.1772319800781,404.0826674779999) translate(-682.1772319800781,-404.0826674779999)">
+                  <path fill="black" stroke="none" paint-order="stroke fill markers" d=" M 667.5174341467448 396.75276856133326 L 682.1772319800781 404.0826674779999 L 667.5174341467448 411.41256639466656 Z"></path>
+                </g>
+              </g>
+              <path fill="white" stroke="black" paint-order="fill stroke markers" d=" M 613.9517943861914 430.4703035779999 L 734.5700879139649 430.4703035779999 L 750.4026695739649 446.30288523799993 L 750.4026695739649 470.9313455979999 L 613.9517943861914 470.9313455979999 L 613.9517943861914 430.4703035779999 M 734.5700879139649 430.4703035779999 L 734.5700879139649 446.30288523799993 L 750.4026695739649 446.30288523799993" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray=""></path>
+              <g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="638.5802547461914" y="455.0987639379999" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">5. User Login</text>
+              </g>
+              <g>
+                <g>
+                  <rect fill="white" stroke="none" x="316.3332963750585" y="497.31898169799996" width="146.26530492996093" height="22.86928462"></rect>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="318.97205998505854" y="513.151563358" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">6. Authorization Code</text>
+              </g>
+              <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 682.1772319800781 520.1882663179999 L 111.23854595933334 520.1882663179999" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray="7.0367029599999995"></path>
+                <g transform="translate(96.7546657,520.1882663179999) translate(-96.7546657,-520.1882663179999)">
+                  <path fill="black" stroke="none" paint-order="stroke fill markers" d=" M 111.41446353333333 512.8583674013332 L 96.7546657 520.1882663179999 L 111.41446353333333 527.5181652346666 Z"></path>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect fill="white" stroke="none" x="220.75880728069006" y="546.5759024179999" width="146.26530492996093" height="22.86928462"></rect>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="223.39757089069008" y="562.4084840779999" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">7. Authorization Code</text>
+              </g>
+              <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 96.7546657 569.445187038 L 476.5443735320078 569.445187038" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray=""></path>
+                <g transform="translate(491.0282537913411,569.445187038) translate(-491.0282537913411,-569.445187038)">
+                  <path fill="black" stroke="none" paint-order="stroke fill markers" d=" M 476.36845595800776 562.1152881213333 L 491.0282537913411 569.445187038 L 476.36845595800776 576.7750859546667 Z"></path>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect fill="white" stroke="none" x="511.84516671467446" y="595.832823138" width="149.5151523420703" height="22.86928462"></rect>
+                </g>
+                <g>
+                  <rect fill="white" stroke="none" x="511.84516671467446" y="613.424580538" width="129.96609533523437" height="22.86928462"></rect>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="514.4839303246745" y="611.6654047979999" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">8. Token Request with</text>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="514.4839303246745" y="629.257162198" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Authorization Code</text>
+              </g>
+              <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 491.0282537913411 636.293865158 L 667.6933517207448 636.293865158" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray=""></path>
+                <g transform="translate(682.1772319800781,636.293865158) translate(-682.1772319800781,-636.293865158)">
+                  <path fill="black" stroke="none" paint-order="stroke fill markers" d=" M 667.5174341467448 628.9639662413333 L 682.1772319800781 636.293865158 L 667.5174341467448 643.6237640746667 Z"></path>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect fill="white" stroke="none" x="530.592488797194" y="662.6815012579999" width="112.02050817703125" height="22.86928462"></rect>
+                </g>
+                <g>
+                  <rect fill="white" stroke="none" x="530.592488797194" y="680.2732586579999" width="92.05633581375" height="22.86928462"></rect>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="533.231252407194" y="678.5140829179999" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">9. Access Token</text>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="533.231252407194" y="696.1058403179999" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">    + ID Token</text>
+              </g>
+              <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 682.1772319800781 703.142543278 L 505.51213405067443 703.142543278" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray="7.0367029599999995"></path>
+                <g transform="translate(491.0282537913411,703.142543278) translate(-491.0282537913411,-703.142543278)">
+                  <path fill="black" stroke="none" paint-order="stroke fill markers" d=" M 505.6880516246745 695.8126443613332 L 491.0282537913411 703.142543278 L 505.6880516246745 710.4724421946667 Z"></path>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect fill="white" stroke="none" x="216.68221578899085" y="755.917815478" width="154.41848791335937" height="22.86928462"></rect>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="219.32097939899086" y="771.7503971379999" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">10. Authorization Code</text>
+              </g>
+              <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 491.0282537913411 778.787100098 L 111.23854595933334 778.787100098" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray="7.0367029599999995"></path>
+                <g transform="translate(96.7546657,778.787100098) translate(-96.7546657,-778.787100098)">
+                  <path fill="black" stroke="none" paint-order="stroke fill markers" d=" M 111.41446353333333 771.4572011813333 L 96.7546657 778.787100098 L 111.41446353333333 786.1169990146667 Z"></path>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect fill="white" stroke="none" x="117.57157862333334" y="805.174736198" width="153.33760107253906" height="22.86928462"></rect>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="120.21034223333334" y="821.007317858" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">11. Authorization Code</text>
+              </g>
+              <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 96.7546657 828.044020818 L 277.2422123598724 828.044020818" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray=""></path>
+                <g transform="translate(291.7260926192057,828.044020818) translate(-291.7260926192057,-828.044020818)">
+                  <path fill="black" stroke="none" paint-order="stroke fill markers" d=" M 277.06629478587234 820.7141219013333 L 291.7260926192057 828.044020818 L 277.06629478587234 835.3739197346667 Z"></path>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect fill="white" stroke="none" x="312.543005542539" y="854.4316569179999" width="157.66833532546875" height="22.86928462"></rect>
+                </g>
+                <g>
+                  <rect fill="white" stroke="none" x="312.543005542539" y="872.0234143179999" width="129.96609533523437" height="22.86928462"></rect>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="315.181769152539" y="870.2642385779999" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">12. Token Request with</text>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="315.181769152539" y="887.8559959779999" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Authorization Code</text>
+              </g>
+              <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 291.7260926192057 894.892698938 L 476.5443735320078 894.892698938" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray=""></path>
+                <g transform="translate(491.0282537913411,894.892698938) translate(-491.0282537913411,-894.892698938)">
+                  <path fill="black" stroke="none" paint-order="stroke fill markers" d=" M 476.36845595800776 887.5628000213333 L 491.0282537913411 894.892698938 L 476.36845595800776 902.2225978546667 Z"></path>
+                </g>
+              </g>
+              <g>
+                <g>
+                  <rect fill="white" stroke="none" x="331.2903276250585" y="921.280335038" width="120.17369116042968" height="22.86928462"></rect>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="333.92909123505854" y="937.1129166979999" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">13. Access Token</text>
+              </g>
+              <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 491.0282537913411 944.149619658 L 306.209972878539 944.149619658" stroke-miterlimit="10" stroke-width="1.4659797833333332" stroke-dasharray="7.0367029599999995"></path>
+                <g transform="translate(291.7260926192057,944.149619658) translate(-291.7260926192057,-944.149619658)">
+                  <path fill="black" stroke="none" paint-order="stroke fill markers" d=" M 306.38589045253906 936.8197207413333 L 291.7260926192057 944.149619658 L 306.38589045253906 951.4795185746667 Z"></path>
+                </g>
+              </g>
+              <g>
+                <g></g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 17.591757400000006 138.447130738 L 776.7903056739648 138.447130738 L 776.7903056739648 970.5372557579999 L 17.591757400000006 970.5372557579999 L 17.591757400000006 138.447130738 Z" stroke-miterlimit="10" stroke-width="2.5131082" stroke-dasharray=""></path>
+                <path fill="white" stroke="black" paint-order="fill stroke markers" d=" M 17.591757400000006 138.447130738 L 17.591757400000006 159.55723961799998 L 230.66092283476564 159.55723961799998 L 241.21597727476563 149.002185178 L 241.21597727476563 138.447130738 L 17.591757400000006 138.447130738" stroke-miterlimit="10" stroke-width="2.5131082" stroke-dasharray=""></path>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="8.8pt" font-style="normal" font-weight="bold" text-decoration="normal" x="35.183514800000005" y="152.52053665799997" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Outer OAuth Flow (Client to AS)</text>
+              </g>
+              <g>
+                <g></g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers" d=" M 35.18351480000001 284.45871715799996 L 759.1985482739648 284.45871715799996 L 759.1985482739648 729.530179378 L 35.18351480000001 729.530179378 L 35.18351480000001 284.45871715799996 Z" stroke-miterlimit="10" stroke-width="2.5131082" stroke-dasharray=""></path>
+                <path fill="white" stroke="black" paint-order="fill stroke markers" d=" M 35.18351480000001 284.45871715799996 L 35.18351480000001 305.56882603799994 L 228.05167620644534 305.56882603799994 L 238.60673064644533 295.01377159799995 L 238.60673064644533 284.45871715799996 L 35.18351480000001 284.45871715799996" stroke-miterlimit="10" stroke-width="2.5131082" stroke-dasharray=""></path>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="8.8pt" font-style="normal" font-weight="bold" text-decoration="normal" x="52.77527220000001" y="298.5321230779999" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Inner OAuth flow (AS to IdP)</text>
+              </g>
+            </g>
+          </g>
+        </svg><a href="#section-3-4" class="pilcrow">¶</a>
+</div>
+<ol start="1" type="1" class="normal type-1" id="section-3-5">
+<li id="section-3-5.1">
+          <p id="section-3-5.1.1">The OAuth Client initiates an OAuth flow by redirecting the User Agent to the Authorization Server.<a href="#section-3-5.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-5.2">
+          <p id="section-3-5.2.1">The User Agent visits the Authorization Server.<a href="#section-3-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-5.3">
+          <p id="section-3-5.3.1">The Authorization Server initiates a new OAuth flow as the OAuth client to the Identity Provider by redirecting the User Agent to the Identity Provider, and provides the additional parameters defined in <a href="#parameters" class="auto internal xref">Section 4</a>.<a href="#section-3-5.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-5.4">
+          <p id="section-3-5.4.1">The User Agent visits the Identity Provider.<a href="#section-3-5.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-5.5">
+          <p id="section-3-5.5.1">The Identity Provider authenticates the End-User.<a href="#section-3-5.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-5.6">
+          <p id="section-3-5.6.1">The Identity Provider issues an authorization code and redirects the User Agent back to the Authorization Server.<a href="#section-3-5.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-5.7">
+          <p id="section-3-5.7.1">The User Agent visits the Authorization Server carrying the authorization code from the Identity Provider.<a href="#section-3-5.7.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-5.8">
+          <p id="section-3-5.8.1">The Authorization Server exchanges the authorization code at the Identity Provider for an access token and optional ID token.<a href="#section-3-5.8.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-5.9">
+          <p id="section-3-5.9.1">The Identity Provider responds with the tokens.<a href="#section-3-5.9.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-5.10">
+          <p id="section-3-5.10.1">The Authorization Server consumes the tokens and issues its own authorization code, and redirects the User Agent back to the Client.<a href="#section-3-5.10.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-5.11">
+          <p id="section-3-5.11.1">The User Agent visits the Client carrying the authorization code from the Authorization Server.<a href="#section-3-5.11.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-5.12">
+          <p id="section-3-5.12.1">The Client exchanges the authorization code for an access token at the Authorization Server.<a href="#section-3-5.12.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-5.13">
+          <p id="section-3-5.13.1">The Authorization Server responds with the tokens.<a href="#section-3-5.13.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+<p id="section-3-6">In this example, the two OAuth flows are authorization code flows. In practice, the inner flow can often be the OpenID Connect Implicit Flow (with <code>response_type=id_token</code>) where there is no intermediate authorization code issued. This distinction is not relevant to the rest of this specification.<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-3-7">Either or both OAuth flows may also be using other OAuth extensions, such as Pushed Authorization Requests <span>[<a href="#RFC9126" class="cite xref">RFC9126</a>]</span>, JWT-Secured Authorization Request <span>[<a href="#RFC9101" class="cite xref">RFC9101</a>]</span> or others. While these extensions may change the example sequence above slightly, they do not fundamentally change the need for the additional context added by this specification. See <a href="#use-in-flows" class="auto internal xref">Section 5</a> for examples of how to provide the properties defined in this specification along with other OAuth extensions.<a href="#section-3-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="parameters">
+<section id="section-4">
+      <h2 id="name-parameters">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-parameters" class="section-name selfRef">Parameters</a>
+      </h2>
+<p id="section-4-1">This specification introduces new parameters in the authorization request to the Identity Provider
+to indicate information about the downstream OAuth client:<a href="#section-4-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-4-2">
+        <dt id="section-4-2.1">"application_class_id":</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.2">
+          <p id="section-4-2.2.1">An identifier for the Application Class, unique within the Authorization Server<a href="#section-4-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-4-2.3">"application_class_name":</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.4">
+          <p id="section-4-2.4.1">A human-readable name describing the Application Class, e.g. "Chat App for iOS"<a href="#section-4-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-4-2.5">"device_id":</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.6">
+          <p id="section-4-2.6.1">An identifier for the Device the End-User is using<a href="#section-4-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-4-2.7">"device_name":</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.8">
+          <p id="section-4-2.8.1">A human-readable name describing the End-User's device, e.g. "Alice's iPhone"<a href="#section-4-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-4-2.9">"session_ref":</dt>
+        <dd style="margin-left: 1.5em" id="section-4-2.10">
+          <p id="section-4-2.10.1">A reference to the End-User session at the OAuth Authorization Server. This <span class="bcp14">MUST NOT</span>
+be the actual session cookie. This identifier enables the IdP to identify a user's session.<a href="#section-4-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="use-in-flows">
+<section id="section-5">
+      <h2 id="name-use-in-oauth-flows">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-use-in-oauth-flows" class="section-name selfRef">Use in OAuth Flows</a>
+      </h2>
+<p id="section-5-1">These parameters can be used in any authorization request to an OAuth Authorization Server or OpenID Provider. Below are examples of including the new parameters in various OAuth flows and extensions.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<div id="oauth-authorization-request">
+<section id="section-5.1">
+        <h3 id="name-oauth-authorization-request">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-oauth-authorization-request" class="section-name selfRef">OAuth Authorization Request</a>
+        </h3>
+<div class="alignLeft art-text artwork" id="section-5.1-1">
+<pre>
+https://idp.example.com/authorize?response_type=code
+  &amp;state=af0ifjsldkj
+  &amp;client_id=s6BhdRkqt3
+  &amp;redirect_uri=https%3A%2F%2Fas.example.org%2Fcb
+  &amp;code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
+  &amp;code_challenge_method=S256
+  &amp;scope=openid+profile
+  &amp;application_class_id=1234
+  &amp;application_class_name=Chat+for+iOS
+  &amp;device_id=9876
+  &amp;device_name=Alice's+iPhone
+  &amp;session_ref=5124
+</pre><a href="#section-5.1-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="par">
+<section id="section-5.2">
+        <h3 id="name-pushed-authorization-reques">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-pushed-authorization-reques" class="section-name selfRef">Pushed Authorization Requests (PAR)</a>
+        </h3>
+<p id="section-5.2-1">The parameters defined in <a href="#parameters" class="auto internal xref">Section 4</a> are added to the Pushed Authorization Request as POST body parameters, as described in Section 2.1 of <span>[<a href="#RFC9126" class="cite xref">RFC9126</a>]</span>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.2-2">
+<pre>
+POST /par HTTP/1.1
+Host: idp.example.com
+Content-Type: application/x-www-form-urlencoded
+
+response_type=code
+&amp;state=af0ifjsldkj
+&amp;client_id=s6BhdRkqt3
+&amp;redirect_uri=https%3A%2F%2Fas.example.org%2Fcb
+&amp;code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
+&amp;code_challenge_method=S256
+&amp;scope=openid+profile
+&amp;application_class_id=1234
+&amp;application_class_name=Chat+for+iOS
+&amp;device_id=9876
+&amp;device_name=Alice's+iPhone
+&amp;session_ref=5124
+</pre><a href="#section-5.2-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="jar">
+<section id="section-5.3">
+        <h3 id="name-jwt-secured-authorization-r">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-jwt-secured-authorization-r" class="section-name selfRef">JWT-Secured Authorization Request (JAR)</a>
+        </h3>
+<p id="section-5.3-1">The parameters defined in <a href="#parameters" class="auto internal xref">Section 4</a> are added to the Request Object as described in Section 4 of <span>[<a href="#RFC9101" class="cite xref">RFC9101</a>]</span>.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-2">The following is an example of the Claims in a Request Object before the base64url encoding and signing.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.3-3">
+<pre>
+{
+ "iss": "s6BhdRkqt3",
+ "aud": "https://idp.example.com",
+ "response_type": "code",
+ "client_id": "s6BhdRkqt3",
+ "redirect_uri": "https://as.example.org/cb",
+ "scope": "openid profile",
+ "state": "af0ifjsldkj",
+ "max_age": 86400,
+ "application_class_id": "1234",
+ "application_class_name": "Chat for iOS",
+ "device_id": "9876",
+ "device_name": "Alice's iPhone",
+ "session_ref": "5124"
+}
+</pre><a href="#section-5.3-3" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-6">
+      <h2 id="name-security-considerations">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-6-1">TODO<a href="#section-6-1" class="pilcrow">¶</a></p>
+<div id="client-authentication">
+<section id="section-6.1">
+        <h3 id="name-client-authentication">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-client-authentication" class="section-name selfRef">Client Authentication</a>
+        </h3>
+<p id="section-6.1-1">Because the parameters defined by this specification are not pre-registered at the Identity Provider, the Identity Provider is trusting the Authorization Server with the values provided in the request.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">For this reason, the Authorization Server <span class="bcp14">MUST</span> be a confidential client and use some form of client authentication to the Identity Provider.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="confidentiality">
+<section id="section-6.2">
+        <h3 id="name-confidentiality">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-confidentiality" class="section-name selfRef">Confidentiality</a>
+        </h3>
+<p id="section-6.2-1">The parameters defined by this specification may contain sensitive data, and should not be exposed to unnecessary parties. In particular, passing this data via the browser in redirects opens up opportunities for observing or tampering with this data.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">For this reason, Authorization Servers <span class="bcp14">SHOULD</span> use Pushed Authorization Requests <span>[<a href="#RFC9126" class="cite xref">RFC9126</a>]</span> and/or JWT-Secured Authorization Request <span>[<a href="#RFC9101" class="cite xref">RFC9101</a>]</span> to prevent tampering and exfiltration of the data.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="session-reference">
+<section id="section-6.3">
+        <h3 id="name-session-reference">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-session-reference" class="section-name selfRef">Session Reference</a>
+        </h3>
+<p id="section-6.3-1">The <code>session_ref</code> parameter is meant to be a pointer to a session, and <span class="bcp14">MUST NOT</span> be the same value as the browser sends to the server as the session cookie.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="privacy-considerations">
+<section id="section-7">
+      <h2 id="name-privacy-considerations">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
+      </h2>
+<p id="section-7-1">TODO<a href="#section-7-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="iana">
+<section id="section-8">
+      <h2 id="name-iana-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-8-1">TODO<a href="#section-8-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<section id="section-9">
+      <h2 id="name-references">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-9.1">
+        <h3 id="name-normative-references">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="OpenID">[OpenID]</dt>
+        <dd>
+<span class="refAuthor">Sakimura, N.</span>, <span class="refAuthor">Bradley, J.</span>, <span class="refAuthor">Jones, M.</span>, <span class="refAuthor">de Medeiros, B.</span>, and <span class="refAuthor">C. Mortimore</span>, <span class="refTitle">"OpenID Connect Core 1.0"</span>, <time datetime="2014-11" class="refDate">November 2014</time>, <span>&lt;<a href="https://openid.net/specs/openid-connect-core-1_0.html">https://openid.net/specs/openid-connect-core-1_0.html</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6749">[RFC6749]</dt>
+        <dd>
+<span class="refAuthor">Hardt, D., Ed.</span>, <span class="refTitle">"The OAuth 2.0 Authorization Framework"</span>, <span class="seriesInfo">RFC 6749</span>, <span class="seriesInfo">DOI 10.17487/RFC6749</span>, <time datetime="2012-10" class="refDate">October 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6749">https://www.rfc-editor.org/rfc/rfc6749</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+      <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-9.2">
+        <h3 id="name-informative-references">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC9101">[RFC9101]</dt>
+        <dd>
+<span class="refAuthor">Sakimura, N.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">M. Jones</span>, <span class="refTitle">"The OAuth 2.0 Authorization Framework: JWT-Secured Authorization Request (JAR)"</span>, <span class="seriesInfo">RFC 9101</span>, <span class="seriesInfo">DOI 10.17487/RFC9101</span>, <time datetime="2021-08" class="refDate">August 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9101">https://www.rfc-editor.org/rfc/rfc9101</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9126">[RFC9126]</dt>
+      <dd>
+<span class="refAuthor">Lodderstedt, T.</span>, <span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Sakimura, N.</span>, <span class="refAuthor">Tonge, D.</span>, and <span class="refAuthor">F. Skokan</span>, <span class="refTitle">"OAuth 2.0 Pushed Authorization Requests"</span>, <span class="seriesInfo">RFC 9126</span>, <span class="seriesInfo">DOI 10.17487/RFC9126</span>, <time datetime="2021-09" class="refDate">September 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9126">https://www.rfc-editor.org/rfc/rfc9126</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+<div id="document-history">
+<section id="appendix-A">
+      <h2 id="name-document-history">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-document-history" class="section-name selfRef">Document History</a>
+      </h2>
+<p id="appendix-A-1">(( To be removed from the final specification ))<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">-00<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-A-3.1">
+          <p id="appendix-A-3.1.1">Initial Draft<a href="#appendix-A-3.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-B">
+      <h2 id="name-acknowledgments">
+<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="appendix-B-1">TODO<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-C">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Aaron Parecki</span></div>
+<div dir="auto" class="left"><span class="org">Okta</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:aaron@parecki.com" class="email">aaron@parecki.com</a>
+</div>
+<div class="url">
+<span>URI:</span>
+<a href="https://aaronparecki.com" class="url">https://aaronparecki.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>

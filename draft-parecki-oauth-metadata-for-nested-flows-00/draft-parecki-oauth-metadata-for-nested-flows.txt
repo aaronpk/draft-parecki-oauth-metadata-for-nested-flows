@@ -1,0 +1,405 @@
+
+
+
+
+Web Authorization Protocol                                    A. Parecki
+Internet-Draft                                                      Okta
+Intended status: Standards Track                         23 October 2023
+Expires: 25 April 2024
+
+
+           OAuth Client and Device Metadata for Nested Flows
+          draft-parecki-oauth-metadata-for-nested-flows-latest
+
+Abstract
+
+   This specification defines a vocabulary and method of transmitting
+   information about an OAuth client when a user is redirected through
+   one or more authorization servers during an OAuth flow.  This
+   provides the deeper nested authorization servers with additional
+   context that they can use for informational or revocation purposes.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at
+   https://aaronpk.github.io/oauth-metadata-for-nested-flows/draft-
+   parecki-oauth-metadata-for-nested-flows.html.  Status information for
+   this document may be found at https://datatracker.ietf.org/doc/draft-
+   parecki-oauth-metadata-for-nested-flows/.
+
+   Discussion of this document takes place on the Web Authorization
+   Protocol Working Group mailing list (mailto:oauth@ietf.org), which is
+   archived at https://mailarchive.ietf.org/arch/browse/oauth/.
+   Subscribe at https://www.ietf.org/mailman/listinfo/oauth/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/aaronpk/oauth-metadata-for-nested-flows.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 25 April 2024.
+
+Copyright Notice
+
+   Copyright (c) 2023 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+     2.1.  Terminology
+   3.  Protocol Overview
+   4.  Parameters
+   5.  Use in OAuth Flows
+     5.1.  OAuth Authorization Request
+     5.2.  Pushed Authorization Requests (PAR)
+     5.3.  JWT-Secured Authorization Request (JAR)
+   6.  Security Considerations
+     6.1.  Client Authentication
+     6.2.  Confidentiality
+     6.3.  Session Reference
+   7.  Privacy Considerations
+   8.  IANA Considerations
+   9.  References
+     9.1.  Normative References
+     9.2.  Informative References
+   Appendix A.  Document History
+   Acknowledgments
+   Author's Address
+
+1.  Introduction
+
+   In a typical OAuth flow, the OAuth client redirects the user agent to
+   the authorization server where the user logs in and (optionally)
+   approves the request.  The OAuth framework describes the interaction
+   between the Client, the Authorization Server, and the Resource
+   Server.  The interaction between the End-User and the Authorization
+   Server, when the user logs in, is intentionally out of scope of
+   OAuth.  In practice, user authentication at the Authorization Server
+   happens via a wide variety of methods, including simple username/
+   password login, as well as redirecting to additional OAuth or OpenID
+   Connect servers, such as when using consumer social login providers
+   or enterprise identity providers.
+
+   When user authentication happens via an external identity provider,
+   it takes place as a brand new OAuth flow from the initial
+   authorization server to the external identity provider.  The initial
+   authorizaiton server acts as an OAuth client to the external identity
+   provider.  Because this is a new flow, the context of the original
+   OAuth flow is lost, and the external identity provider is unable to
+   take actions or record information based on the actual OAuth client
+   the End-User is using.
+
+   This specification introduces a vocabulary and method of transmitting
+   information about an OAuth client to an external identity provider
+   when used in nested flows.
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+2.1.  Terminology
+
+   This specification uses the terms "Access Token", "Authorization
+   Code", "Authorization Endpoint", "Authorization Server" (AS),
+   "Client", "Client Authentication", "Client Identifier", "Client
+   Secret", "End-User", "Grant Type", "Protected Resource", "Redirection
+   URI", "Refresh Token", "Resource Owner", "Resource Server" (RS) and
+   "Token Endpoint" defined by [RFC6749], and the terms "OpenID
+   Provider" (OP) and "ID Token" defined by [OpenID].
+
+   TODO: Replace RFC6749 references with OAuth 2.1
+
+   This specification defines the following terms:
+
+   "Application Class":  The type of application the End-User is logging
+      in to, as defined by the AS in the first OAuth flow.
+
+   "Device":  The physical device the End-User is interacting with when
+      authorizing a Client.
+
+   This specification uses the term "Identity Provider" (IdP) to refer
+   to the Authorization Server or OpenID Provider that is used for End-
+   User authentication.
+
+3.  Protocol Overview
+
+   For the sake of simplicity, we will refer to the parties involved in
+   the flow as:
+
+   *  User Agent: The browser used by the End-User
+
+   *  Client: The OAuth client that is being used by the End-User
+
+   *  Authorization Server (AS): The authorization server the Client
+      interacts with and is expecting to receive tokens from
+
+   *  Identity Provider (IdP): The authorization server where the End-
+      User has an account and logs in
+
+   (In practice, in the inner OAuth flow, the Authorization Server is
+   acting as an OAuth Client to the Identity Provider.)
+
+   (Artwork only available as svg: nested-oauth-flow.svg)
+
+   1.   The OAuth Client initiates an OAuth flow by redirecting the User
+        Agent to the Authorization Server.
+
+   2.   The User Agent visits the Authorization Server.
+
+   3.   The Authorization Server initiates a new OAuth flow as the OAuth
+        client to the Identity Provider by redirecting the User Agent to
+        the Identity Provider, and provides the additional parameters
+        defined in Section 4.
+
+   4.   The User Agent visits the Identity Provider.
+
+   5.   The Identity Provider authenticates the End-User.
+
+   6.   The Identity Provider issues an authorization code and redirects
+        the User Agent back to the Authorization Server.
+
+   7.   The User Agent visits the Authorization Server carrying the
+        authorization code from the Identity Provider.
+
+   8.   The Authorization Server exchanges the authorization code at the
+        Identity Provider for an access token and optional ID token.
+
+   9.   The Identity Provider responds with the tokens.
+
+   10.  The Authorization Server consumes the tokens and issues its own
+        authorization code, and redirects the User Agent back to the
+        Client.
+
+   11.  The User Agent visits the Client carrying the authorization code
+        from the Authorization Server.
+
+   12.  The Client exchanges the authorization code for an access token
+        at the Authorization Server.
+
+   13.  The Authorization Server responds with the tokens.
+
+   In this example, the two OAuth flows are authorization code flows.
+   In practice, the inner flow can often be the OpenID Connect Implicit
+   Flow (with response_type=id_token) where there is no intermediate
+   authorization code issued.  This distinction is not relevant to the
+   rest of this specification.
+
+   Either or both OAuth flows may also be using other OAuth extensions,
+   such as Pushed Authorization Requests [RFC9126], JWT-Secured
+   Authorization Request [RFC9101] or others.  While these extensions
+   may change the example sequence above slightly, they do not
+   fundamentally change the need for the additional context added by
+   this specification.  See Section 5 for examples of how to provide the
+   properties defined in this specification along with other OAuth
+   extensions.
+
+4.  Parameters
+
+   This specification introduces new parameters in the authorization
+   request to the Identity Provider to indicate information about the
+   downstream OAuth client:
+
+   "application_class_id":  An identifier for the Application Class,
+      unique within the Authorization Server
+
+   "application_class_name":  A human-readable name describing the
+      Application Class, e.g.  "Chat App for iOS"
+
+   "device_id":  An identifier for the Device the End-User is using
+
+   "device_name":  A human-readable name describing the End-User's
+      device, e.g.  "Alice's iPhone"
+
+   "session_ref":  A reference to the End-User session at the OAuth
+      Authorization Server.  This MUST NOT be the actual session cookie.
+      This identifier enables the IdP to identify a user's session.
+
+5.  Use in OAuth Flows
+
+   These parameters can be used in any authorization request to an OAuth
+   Authorization Server or OpenID Provider.  Below are examples of
+   including the new parameters in various OAuth flows and extensions.
+
+5.1.  OAuth Authorization Request
+
+   https://idp.example.com/authorize?response_type=code
+     &state=af0ifjsldkj
+     &client_id=s6BhdRkqt3
+     &redirect_uri=https%3A%2F%2Fas.example.org%2Fcb
+     &code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
+     &code_challenge_method=S256
+     &scope=openid+profile
+     &application_class_id=1234
+     &application_class_name=Chat+for+iOS
+     &device_id=9876
+     &device_name=Alice's+iPhone
+     &session_ref=5124
+
+5.2.  Pushed Authorization Requests (PAR)
+
+   The parameters defined in Section 4 are added to the Pushed
+   Authorization Request as POST body parameters, as described in
+   Section 2.1 of [RFC9126].
+
+   POST /par HTTP/1.1
+   Host: idp.example.com
+   Content-Type: application/x-www-form-urlencoded
+
+   response_type=code
+   &state=af0ifjsldkj
+   &client_id=s6BhdRkqt3
+   &redirect_uri=https%3A%2F%2Fas.example.org%2Fcb
+   &code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
+   &code_challenge_method=S256
+   &scope=openid+profile
+   &application_class_id=1234
+   &application_class_name=Chat+for+iOS
+   &device_id=9876
+   &device_name=Alice's+iPhone
+   &session_ref=5124
+
+5.3.  JWT-Secured Authorization Request (JAR)
+
+   The parameters defined in Section 4 are added to the Request Object
+   as described in Section 4 of [RFC9101].
+
+   The following is an example of the Claims in a Request Object before
+   the base64url encoding and signing.
+
+   {
+    "iss": "s6BhdRkqt3",
+    "aud": "https://idp.example.com",
+    "response_type": "code",
+    "client_id": "s6BhdRkqt3",
+    "redirect_uri": "https://as.example.org/cb",
+    "scope": "openid profile",
+    "state": "af0ifjsldkj",
+    "max_age": 86400,
+    "application_class_id": "1234",
+    "application_class_name": "Chat for iOS",
+    "device_id": "9876",
+    "device_name": "Alice's iPhone",
+    "session_ref": "5124"
+   }
+
+6.  Security Considerations
+
+   TODO
+
+6.1.  Client Authentication
+
+   Because the parameters defined by this specification are not pre-
+   registered at the Identity Provider, the Identity Provider is
+   trusting the Authorization Server with the values provided in the
+   request.
+
+   For this reason, the Authorization Server MUST be a confidential
+   client and use some form of client authentication to the Identity
+   Provider.
+
+6.2.  Confidentiality
+
+   The parameters defined by this specification may contain sensitive
+   data, and should not be exposed to unnecessary parties.  In
+   particular, passing this data via the browser in redirects opens up
+   opportunities for observing or tampering with this data.
+
+   For this reason, Authorization Servers SHOULD use Pushed
+   Authorization Requests [RFC9126] and/or JWT-Secured Authorization
+   Request [RFC9101] to prevent tampering and exfiltration of the data.
+
+6.3.  Session Reference
+
+   The session_ref parameter is meant to be a pointer to a session, and
+   MUST NOT be the same value as the browser sends to the server as the
+   session cookie.
+
+7.  Privacy Considerations
+
+   TODO
+
+8.  IANA Considerations
+
+   TODO
+
+9.  References
+
+9.1.  Normative References
+
+   [OpenID]   Sakimura, N., Bradley, J., Jones, M., de Medeiros, B., and
+              C. Mortimore, "OpenID Connect Core 1.0", November 2014,
+              <https://openid.net/specs/openid-connect-core-1_0.html>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC6749]  Hardt, D., Ed., "The OAuth 2.0 Authorization Framework",
+              RFC 6749, DOI 10.17487/RFC6749, October 2012,
+              <https://www.rfc-editor.org/rfc/rfc6749>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+9.2.  Informative References
+
+   [RFC9101]  Sakimura, N., Bradley, J., and M. Jones, "The OAuth 2.0
+              Authorization Framework: JWT-Secured Authorization Request
+              (JAR)", RFC 9101, DOI 10.17487/RFC9101, August 2021,
+              <https://www.rfc-editor.org/rfc/rfc9101>.
+
+   [RFC9126]  Lodderstedt, T., Campbell, B., Sakimura, N., Tonge, D.,
+              and F. Skokan, "OAuth 2.0 Pushed Authorization Requests",
+              RFC 9126, DOI 10.17487/RFC9126, September 2021,
+              <https://www.rfc-editor.org/rfc/rfc9126>.
+
+Appendix A.  Document History
+
+   (( To be removed from the final specification ))
+
+   -00
+
+   *  Initial Draft
+
+Acknowledgments
+
+   TODO
+
+Author's Address
+
+   Aaron Parecki
+   Okta
+   Email: aaron@parecki.com
+   URI:   https://aaronparecki.com
