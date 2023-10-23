@@ -36,7 +36,12 @@ informative:
 
 --- abstract
 
-TODO Abstract
+This specification defines a vocabulary and method of transmitting
+information about an OAuth client to authorization servers during an
+OAuth flow that the user may need to redirect through that sit behind
+the first authorization server the client is interacting with. This
+provides the deeper nested authorization servers with additional context
+that they can use for informational or revocation purposes.
 
 
 --- middle
