@@ -14,9 +14,8 @@ Expires: 25 April 2024
 Abstract
 
    This specification defines a vocabulary and method of transmitting
-   information about an OAuth client to authorization servers during an
-   OAuth flow that the user may need to redirect through that sit behind
-   the first authorization server the client is interacting with.  This
+   information about an OAuth client when a user is redirected through
+   one or more authorization servers during an OAuth flow.  This
    provides the deeper nested authorization servers with additional
    context that they can use for informational or revocation purposes.
 
@@ -81,7 +80,30 @@ Table of Contents
 
 1.  Introduction
 
-   TODO Introduction
+   In a typical OAuth flow, the OAuth client redirects the user agent to
+   the authorization server where the user logs in and (optionally)
+   approves the request.  The OAuth framework describes the interaction
+   between the Client, the Authorization Server, and the Resource
+   Server.  The interaction between the End-User and the Authorization
+   Server, when the user logs in, is intentionally out of scope of
+   OAuth.  In practice, user authentication at the Authorization Server
+   happens via a wide variety of methods, including simple username/
+   password login, as well as redirecting to additional OAuth or OpenID
+   Connect servers, such as when using consumer social login providers
+   or enterprise identity providers.
+
+   When user authentication happens via an external identity provider,
+   it takes place as a brand new OAuth flow from the initial
+   authorization server to the external identity provider.  The initial
+   authorizaiton server acts as an OAuth client to the external identity
+   provider.  Because this is a new flow, the context of the original
+   OAuth flow is lost, and the external identity provider is unable to
+   take actions or record information based on the actual OAuth client
+   the End-User is using.
+
+   This specification introduces a vocabulary and method of transmitting
+   information about an OAuth client to an external identity provider
+   when used in nested flows.
 
 2.  Conventions and Definitions
 
@@ -97,7 +119,7 @@ Table of Contents
 
 4.  IANA Considerations
 
-   This document has no IANA actions.
+   TODO
 
 5.  Normative References
 
@@ -116,7 +138,7 @@ Table of Contents
 
 Acknowledgments
 
-   TODO acknowledge.
+   TODO
 
 Author's Address
 
