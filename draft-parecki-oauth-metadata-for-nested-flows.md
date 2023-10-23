@@ -1,6 +1,6 @@
 ---
 title: "OAuth Client and Device Metadata for Nested Flows"
-category: info
+category: std
 
 docname: draft-parecki-oauth-metadata-for-nested-flows-latest
 submissiontype: IETF
@@ -26,6 +26,7 @@ author:
     fullname: Aaron Parecki
     organization: Okta
     email: aaron@parecki.com
+    uri: https://aaronparecki.com
 
 normative:
   RFC6749:
