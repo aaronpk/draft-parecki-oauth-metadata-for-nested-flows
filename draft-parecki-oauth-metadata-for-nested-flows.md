@@ -127,7 +127,7 @@ For the sake of simplicity, we will refer to the parties involved in the flow as
 
 1. The OAuth Client initiates an OAuth flow by redirecting the User Agent to the Authorization Server.
 2. The User Agent visits the Authorization Server.
-3. The Authorization Server initiates a new OAuth flow as the OAuth client to the Identity Provider by redirecting the User Agent to the Identity Provider.
+3. The Authorization Server initiates a new OAuth flow as the OAuth client to the Identity Provider by redirecting the User Agent to the Identity Provider, and provides the additional parameters defined in {{parameters}}.
 4. The User Agent visits the Identity Provider.
 5. The Identity Provider authenticates the End-User.
 6. The Identity Provider issues an authorization code and redirects the User Agent back to the Authorization Server.
