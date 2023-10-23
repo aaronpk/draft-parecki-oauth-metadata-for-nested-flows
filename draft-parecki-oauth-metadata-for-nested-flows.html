@@ -1640,7 +1640,11 @@ be the actual session ID. This identifier enables the IdP to identify a session.
 <div class="alignLeft art-text artwork" id="section-5.1-1">
 <pre>
 https://idp.example.com/authorize?response_type=code
-  &amp;client_id=CLIENT_ID
+  &amp;state=af0ifjsldkj
+  &amp;client_id=s6BhdRkqt3
+  &amp;redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+  &amp;code_challenge=K2-ltc83acc4h0c9w6ESC_rEMTJ3bww-uCHaoeK1t8U
+  &amp;code_challenge_method=S256
   &amp;scope=openid+profile
   &amp;application_class_id=1234
   &amp;application_class_name=Chat+for+iOS
