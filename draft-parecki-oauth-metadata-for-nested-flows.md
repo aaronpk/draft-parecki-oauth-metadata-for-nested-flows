@@ -163,7 +163,7 @@ to indicate information about the downstream OAuth client:
 
 "session_ref":
 : A reference to the End-User session at the OAuth Authorization Server. This MUST NOT
-  be the actual session ID. This identifier enables the IdP to identify a session.
+  be the actual session cookie. This identifier enables the IdP to identify a user's session.
 
 
 
@@ -240,7 +240,9 @@ TODO
 
 ## Client Authentication
 
-The Authorization Server acting as an OAuth client to the Identity Provider SHOULD
+Because the parameters defined by this specification are not pre-registered at the Identity Provider, the Identity Provider is trusting the Authorization Server with the values provided in the request.
+
+For this reason, the Authorization Server MUST be a confidential client and use some form of client authentication to the Identity Provider.
 
 
 ## Confidentiality
